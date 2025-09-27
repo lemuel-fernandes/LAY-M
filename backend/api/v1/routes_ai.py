@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Request, HTTPException, Depends, Path
+from fastapi import APIRouter, Request, HTTPException, Depends
 from pydantic import BaseModel
-from typing import List, Optional
-from services.authMiddleware import require_roles
+from typing import Optional
+# use role helper from auth utilities (middleware module only provides middleware class)
+
 router = APIRouter(prefix="/api/v1/ai", tags=["ai"])
 
 class PlanRequest(BaseModel):
