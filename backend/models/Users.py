@@ -1,5 +1,5 @@
-from pydantic import BaseModel, EmailStr, Field,validator
-from typing import Optional
+from pydantic import BaseModel, EmailStr, Field, validator
+from typing import Optional, List
 from bson import ObjectId
 
 
@@ -26,11 +26,12 @@ class UserModel(BaseModel):
     id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
     email: EmailStr
     username: str
-    full_name: Optional[str]
+    full_name: Optional[str] = None
     password: str
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
+    roles: List[str] = Field(default_factory=lambda: ['event_manager', 'user', 'event_staff'])
 
     @validator('password')
     def validate_password(cls, v):
@@ -40,8 +41,7 @@ class UserModel(BaseModel):
             raise ValueError('Password must be at least 8 characters long')
         return v
 
-    model_config = {
-        "populate_by_name": True,
-        "arbitrary_types_allowed": True,
-        "json_encoders": {ObjectId: str},
-    }
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}

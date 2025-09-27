@@ -49,6 +49,7 @@ event-manager-platform/
 │    │   ├── feedback_service.py
 │    │   ├── certificate_service.py
 │    │   ├── gallery_service.py
+|    |   ├── authMiddleware.py
 │    │   └── ai_service.py              # Calls AI ML models or APIs
 │    │
 │    ├── ml/                            # Local ML models

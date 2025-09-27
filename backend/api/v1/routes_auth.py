@@ -9,6 +9,7 @@ import hashlib
 import bcrypt
 from models.Users import UserModel
 from dotenv import load_dotenv
+from fastapi.security import OAuth2PasswordBearer
 
 
 SECRET_KEY = os.getenv("JWT_SECRET", "supersecretkey")
@@ -105,3 +106,22 @@ async def login(user: UserLogin):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     token = create_access_token({"sub": user.email})
     return {"access_token": token, "token_type": "bearer"}
+
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # tokenUrl is the endpoint where you get tokens
+
+@router.get("/me")
+async def read_users_me(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+    user = await users_collection.find_one({"email": email})
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    return {"email": user["email"], "username": user["username"], "full_name": user.get("full_name")}
