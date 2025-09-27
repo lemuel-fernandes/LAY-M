@@ -12,6 +12,9 @@ from pymongo.errors import PyMongoError
 from api.v1.routes_vendor import router as vendor_router
 from api.v1.routes_certificates import router as certificates_router
 from api.v1.routes_gallery import router as gallery_router
+from services.aiServices import AIService
+from api.v1.routes_volunteers import router as volunteers_router
+from api.v1.routes_ai import router as ai_router
 app = FastAPI()
 app.add_middleware( 
     CORSMiddleware,
@@ -28,16 +31,20 @@ protected_routes_roles = {}
 
 # Include all routers
 app.include_router(auth_router)
-app.include_router(task_router)  # Add this line
+app.include_router(task_router)  
 app.include_router(events_router)
 app.include_router(vendor_router)
 app.include_router(certificates_router)
 app.include_router(gallery_router)
+app.include_router(volunteers_router)
+app.include_router(ai_router)
 
 @app.on_event("startup")
 async def startup_db():
     app.state.mongo_client = mongo_client
     app.state.db = mongo_client["local"]
+    # attach AI service instance using the live DB
+    app.state.ai_service = AIService(app.state.db)
 
 
 @app.get("/")
