@@ -2,32 +2,89 @@
 ```
 event-manager-platform/
 │
-├── backend/                          # Core backend services (Node.js / Express / NestJS)
-│   ├── src/
-│   │   ├── api/                      # REST/GraphQL endpoints
-│   │   │   ├── tasks/                # Task Manager APIs
-│   │   │   ├── vendors/              # Vendor & Resource APIs
-│   │   │   ├── volunteers/           # Volunteer APIs
-│   │   │   ├── speakers/             # Speaker APIs
-│   │   │   ├── agenda/               # Agenda APIs
-│   │   │   ├── feedback/             # Feedback APIs
-│   │   │   ├── certificates/         # Certificate APIs
-│   │   │   ├── gallery/              # Photo Gallery APIs
-│   │   │   └── ai/                   # AI-powered endpoints (connect ML services)
-│   │   │
-│   │   ├── models/                   # Database models (Mongoose/Prisma/Sequelize)
-│   │   ├── controllers/              # Business logic for each module
-│   │   ├── services/                 # Reusable service functions
-│   │   │   ├── notification.service.js
-│   │   │   ├── email.service.js
-│   │   │   └── ai.service.js         # Calls ML microservices
-│   │   ├── utils/                    # Helpers (logging, error handling, date utils)
-│   │   ├── config/                   # DB, API keys, environment configs
-│   │   ├── middlewares/              # Auth, validation, error handling
-│   │   └── index.js                  # App entry point
-│   │
-│   ├── tests/                        # Backend unit & integration tests
-│   └── package.json
+├── backend/
+│
+├-── app/
+│    ├── main.py                        # FastAPI entry point
+│    ├── core/                          # Core configs
+│    │   ├── config.py                  # App settings, env variables
+│    │   ├── security.py                # JWT, role-based access
+│    │   └── logging.py                 # Logging setup
+│    │
+│    ├── api/                           # API routes
+│    │   ├── v1/
+│    │   │   ├── routes_tasks.py
+│    │   │   ├── routes_vendors.py
+│    │   │   ├── routes_volunteers.py
+│    │   │   ├── routes_speakers.py
+│    │   │   ├── routes_agenda.py
+│    │   │   ├── routes_feedback.py
+│    │   │   ├── routes_certificates.py
+│    │   │   ├── routes_gallery.py
+│    │   │   └── routes_ai.py           # AI endpoints
+│    │   └── __init__.py
+│    │
+│    ├── models/                        # MongoDB models (Beanie or Pydantic BaseModel)
+│    │   ├── task.py
+│    │   ├── vendor.py
+│    │   ├── volunteer.py
+│    │   ├── speaker.py
+│    │   ├── agenda.py
+│    │   ├── feedback.py
+│    │   ├── certificate.py
+│    │   └── gallery.py
+│    │
+│    ├── schemas/                       # Request/response Pydantic schemas
+│    │   ├── task.py
+│    │   ├── vendor.py
+│    │   ├── volunteer.py
+│    │   ├── speaker.py
+│    │   ├── agenda.py
+│    │   ├── feedback.py
+│    │   ├── certificate.py
+│    │   └── gallery.py
+│    │
+│    ├── services/                      # Business logic
+│    │   ├── task_service.py
+│    │   ├── vendor_service.py
+│    │   ├── volunteer_service.py
+│    │   ├── speaker_service.py
+│    │   ├── agenda_service.py
+│    │   ├── feedback_service.py
+│    │   ├── certificate_service.py
+│    │   ├── gallery_service.py
+│    │   └── ai_service.py              # Calls AI ML models or APIs
+│    │
+│    ├── ml/                            # Local ML models
+│    │   ├── feedback_nlp.py            # Sentiment/summarization
+│    │   ├── risk_forecasting.py        # Task/vendor risk scoring
+│    │   ├── engagement_cv.py           # Computer Vision engagement
+│    │   └── recommender.py             # Recommendations
+│    │
+│    ├── db/                            # MongoDB connection
+│    │   ├── init_db.py                 # DB init (Motor/Beanie)
+│    │   ├── base.py                    # Common DB utilities
+│    │   └── seed.py                    # Seed sample data
+│    │
+│    ├── utils/                         # Helper functions
+│    │   ├── email.py                   # Email service
+│    │   ├── file_upload.py             # File & image handling
+│    │   ├── pdf_generator.py           # Certificate PDFs
+│    │   └── ai_connector.py            # Call external AI APIs
+│    │
+│    ├── tests/                         # Unit & integration tests
+│    │   ├── test_tasks.py
+│    │   ├── test_vendors.py
+│    │   ├── test_feedback.py
+│    │   └── test_ai.py
+│    │
+│    └── __init__.py
+│
+├── requirements.txt                   # Python dependencies
+├── .env.example                       # Example environment config
+├── Dockerfile
+└── README.md
+
 │
 ├── ai-services/                      # AI & ML microservices (Python)
 │   ├── feedback_nlp/                 # NLP models (summarization, sentiment)
