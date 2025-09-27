@@ -7,7 +7,7 @@ from db.db import client as mongo_client
 from services.authMiddleware import AuthMiddleware
 from pymongo.errors import PyMongoError
 from services.roleMiddleware import RoleMiddleware
-
+from api.v1.routes_events import router as events_router
 app = FastAPI()
 app.add_middleware( 
     CORSMiddleware,
@@ -17,17 +17,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-protected_routes = ["/api/v1/tasks", "/api/v1/users/me"]
+protected_routes = ["/api/v1/tasks", "/api/v1/users/me", 'api/v1/eventrs']
 app.add_middleware(AuthMiddleware, protected_paths=protected_routes)
 protected_routes_roles = {}
 
 
 app.include_router(auth_router)
-
+app.include_router(events_router)
 
 @app.on_event("startup")
 async def startup_db():
-    # Use the shared client from db.db
     app.state.mongo_client = mongo_client
     app.state.db = mongo_client["local"]
 
