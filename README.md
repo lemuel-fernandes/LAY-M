@@ -5,11 +5,7 @@ event-manager-platform/
 ├── backend/
 │
 ├-── app/
-│    ├── main.py                        # FastAPI entry point
-│    ├── core/                          # Core configs
-│    │   ├── config.py                  # App settings, env variables
-│    │   ├── security.py                # JWT, role-based access
-│    │   └── logging.py                 # Logging setup
+│    ├── server.py                        # FastAPI entry point
 │    │
 │    ├── api/                           # API routes
 │    │   ├── v1/
@@ -63,8 +59,7 @@ event-manager-platform/
 │    │
 │    ├── db/                            # MongoDB connection
 │    │   ├── init_db.py                 # DB init (Motor/Beanie)
-│    │   ├── base.py                    # Common DB utilities
-│    │   └── seed.py                    # Seed sample data
+│    │   ├── db.py 
 │    │
 │    ├── utils/                         # Helper functions
 │    │   ├── email.py                   # Email service
