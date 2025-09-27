@@ -6,6 +6,7 @@ from api.v1.routes_auth import router as auth_router
 from db.db import client as mongo_client  
 from services.authMiddleware import AuthMiddleware
 from pymongo.errors import PyMongoError
+from services.roleMiddleware import RoleMiddleware
 
 app = FastAPI()
 app.add_middleware( 
@@ -18,6 +19,8 @@ app.add_middleware(
 
 protected_routes = ["/api/v1/tasks", "/api/v1/users/me"]
 app.add_middleware(AuthMiddleware, protected_paths=protected_routes)
+protected_routes_roles = {}
+
 
 app.include_router(auth_router)
 
