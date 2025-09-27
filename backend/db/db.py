@@ -14,11 +14,11 @@ db = client['myappdb']
 
 users_collection = db['users']
 tasks_collection = db['tasks']
+events_collection = db['events']
 
 async def create_collections():
     await users_collection.insert_one({"init": "users_collection"})
     await tasks_collection.insert_one({"init": "tasks_collection"})
 
-# Run the async function to create collections
 if __name__ == "__main__":
     asyncio.run(create_collections())

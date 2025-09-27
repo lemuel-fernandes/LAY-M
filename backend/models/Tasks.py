@@ -4,7 +4,6 @@ from bson import ObjectId
 from datetime import datetime
 from db.db import tasks_collection
 
-# Reuse the same PyObjectId helper
 class PyObjectId(ObjectId):
     @classmethod
     def __get_validators__(cls):
