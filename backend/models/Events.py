@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, validator
 from typing import Optional, List
 from datetime import datetime
 from bson import ObjectId
+from enum import Enum
 
 
 class EventStatusEnum(str, Enum):
