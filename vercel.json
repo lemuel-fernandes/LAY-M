@@ -1,0 +1,57 @@
+{
+    "version": 2,
+    "buildCommand": "cd frontend && npm install && npm run build",
+    "outputDirectory": "frontend/build",
+    "builds": [
+        {
+            "src": "backend/server.py",
+            "use": "@vercel/python"
+        },
+        {
+            "src": "frontend/package.json",
+            "use": "@vercel/next"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/v1/(.*)",
+            "dest": "backend/server.py"
+        },
+        {
+            "src": "/docs",
+            "dest": "backend/server.py"
+        },
+        {
+            "src": "/openapi.json",
+            "dest": "backend/server.py"
+        },
+        {
+            "src": "/static/(.*)",
+            "dest": "frontend/static/$1"
+        },
+        {
+            "src": "/(.*)\\.(.+)",
+            "dest": "frontend/$1.$2"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "frontend/index.html"
+        }
+    ],
+    "env": {
+        "MONGODB_URI": "@mongodb_uri",
+        "SECRET_KEY": "@jwt_secret_key",
+        "ALGORITHM": "HS256",
+        "FRONTEND_URL": "@frontend_url",
+        "ENVIRONMENT": "production",
+        "AI_SERVICE_URL": "@ai_service_url",
+        "OPENAI_API_KEY": "@openai_api_key",
+        "SPACY_MODEL": "en_core_web_sm"
+    },
+    "functions": {
+        "backend/server.py": {
+            "memory": 1024,
+            "maxDuration": 10
+        }
+    }
+}
