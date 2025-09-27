@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
-from bson import ObjectId
-
+from bson import ObjectId, SON
+from db.db import users_collection
 
 class PyObjectId(ObjectId):
     @classmethod

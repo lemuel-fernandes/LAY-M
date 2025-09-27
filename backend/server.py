@@ -6,7 +6,7 @@ from api.v1.routes_auth import router as auth_router
 
 
 app = FastAPI()
-app.add_middleware(
+app.add_middleware( 
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
