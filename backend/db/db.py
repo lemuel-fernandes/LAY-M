@@ -16,6 +16,9 @@ users_collection = db['users']
 tasks_collection = db['tasks']
 events_collection = db['events']
 vendors_collection = db['vendors_contracts']
+certificates_collection = db['certificates']
+gallery_collection = db['gallery']
+
 async def create_collections():
     await users_collection.insert_one({"init": "users_collection"})
     await tasks_collection.insert_one({"init": "tasks_collection"})

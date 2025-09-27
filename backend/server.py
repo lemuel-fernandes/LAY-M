@@ -9,7 +9,9 @@ from api.v1.routes_feedback import router as feedback_router
 from db.db import client as mongo_client  
 from services.authMiddleware import AuthMiddleware
 from pymongo.errors import PyMongoError
-
+from api.v1.routes_vendor import router as vendor_router
+from api.v1.routes_certificates import router as certificates_router
+from api.v1.routes_gallery import router as gallery_router
 app = FastAPI()
 app.add_middleware( 
     CORSMiddleware,
@@ -28,7 +30,9 @@ protected_routes_roles = {}
 app.include_router(auth_router)
 app.include_router(task_router)  # Add this line
 app.include_router(events_router)
-app.include_router(feedback_router)
+app.include_router(vendor_router)
+app.include_router(certificates_router)
+app.include_router(gallery_router)
 
 @app.on_event("startup")
 async def startup_db():
