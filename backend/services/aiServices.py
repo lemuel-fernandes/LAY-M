@@ -1,8 +1,11 @@
 from typing import List, Dict, Any
+from collections import Counter
 import re
 import os
 import httpx
-from collections import Counter
+from datetime import datetime, timedelta
+from bson import ObjectId
+from typing import Optional
 
 class AIService:
     """
@@ -33,6 +36,7 @@ class AIService:
         """
         Minimal async wrapper to call a Gemini-like generative REST endpoint.
         Requires GEMINI_API_KEY env var (API key appended as ?key=...).
+        Returns best-effort text or an error string.
         """
         if not self.gemini_key:
             return "Gemini API key not configured."
@@ -49,25 +53,30 @@ class AIService:
             try:
                 resp.raise_for_status()
             except Exception:
-                # return raw text on error for easier debugging
                 return f"Gemini error: {resp.status_code} - {resp.text}"
 
             data = resp.json()
-            # Google generative API returns candidates -> content (varies by version)
-            # Handle common shapes conservatively:
+
+            # Try common response shapes
             if "candidates" in data and isinstance(data["candidates"], list) and data["candidates"]:
                 cand = data["candidates"][0]
-                return cand.get("content", cand.get("output", "")).strip()
-            if "output" in data:
-                return data["output"].get("text", "").strip()
-            # fallback:
+                # some variants use 'content' or 'output' keys
+                return cand.get("content") or cand.get("output") or str(cand)
+            if "output" in data and isinstance(data["output"], dict):
+                # newer shapes may include 'text' under output
+                text = data["output"].get("text")
+                if text:
+                    return text
+            # fallback to any text-like field
+            for k in ("text", "response", "content"):
+                if k in data:
+                    return str(data[k])
             return str(data)
 
-    async def generate_project_plan(self, event_id: str, constraints: Dict[str, Any] = None) -> str:
+    async def generate_project_plan(self, event_id: str, constraints: Optional[Dict[str, Any]] = None) -> str:
         """
         Produce a project plan for an event using event data + generative model.
         """
-        from bson import ObjectId
         try:
             oid = ObjectId(event_id)
         except Exception:
@@ -102,7 +111,6 @@ class AIService:
         Heuristic predictive logic for tasks + optional model augmentation.
         Returns simple risk scores per task and optional recommendations.
         """
-        from bson import ObjectId
         try:
             oid = ObjectId(event_id)
         except Exception:
@@ -112,7 +120,7 @@ class AIService:
         if not event:
             return {"error": "event_not_found"}
 
-        # collect tasks linked to event
+        # collect tasks linked to event (assume event_id stored as string)
         cursor = self.tasks.find({"event_id": event_id})
         tasks = []
         async for t in cursor:
@@ -120,15 +128,12 @@ class AIService:
 
         results = []
         for t in tasks:
-            # Simple heuristic risk: missing assignee, overdue, or long un-updated
             score = 0.0
             if not t.get("assignee"):
                 score += 0.5
             due = t.get("due_date")
-            status = t.get("status", "open").lower()
+            status = (t.get("status") or "open").lower()
             if due:
-                # naive: string compare or date handling could be enhanced
-                from datetime import datetime, timedelta
                 try:
                     due_dt = datetime.fromisoformat(due)
                     if due_dt < datetime.utcnow():
@@ -143,7 +148,6 @@ class AIService:
             score = min(1.0, score)
             results.append({"task_id": str(t.get("_id")), "title": t.get("title"), "risk_score": round(score, 3)})
 
-        # optional: augment with generative recommendations
         prompt = (
             f"For event '{event.get('title')}', provide short recommendations to reduce task risk.\n"
             f"Tasks summary: {[(r['task_id'], r['title'], r['risk_score']) for r in results]}\n"
@@ -157,7 +161,6 @@ class AIService:
         Build a post-event report by summarizing feedback, attendance and key metrics, then use Gemini
         to create a polished narrative report.
         """
-        from bson import ObjectId
         try:
             oid = ObjectId(event_id)
         except Exception:
@@ -234,7 +237,6 @@ class AIService:
         return float(score)
 
     async def recommend_volunteers(self, event_id: str, limit: int = 10) -> List[Dict[str, Any]]:
-        from bson import ObjectId
         try:
             oid = ObjectId(event_id)
         except Exception:
