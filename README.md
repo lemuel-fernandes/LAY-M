@@ -134,3 +134,11 @@ event-manager-platform/
 └── package.json                       # Root project (monorepo config if using Nx/Turbo)
 
 ```
+
+for backend
+```
+cd backend 
+python -m venv venv
+venv/scripts/activate
+pip install -r requirements.txt
+```
