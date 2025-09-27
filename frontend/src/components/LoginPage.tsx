@@ -117,7 +117,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent'
             }}>
-              LAY-M AI
+              SYNKRONIS
             </h1>
           </div>
           

@@ -368,7 +368,7 @@ const AIEventDashboard: React.FC<AIEventDashboardProps> = ({ onLogout }) => {
               <Brain size={24} color="white" />
             </div>
             <div>
-              <h1 style={styles.title}>LAY-M AI</h1>
+              <h1 style={styles.title}>SYNKRONIS</h1>
               <p style={styles.subtitle}>Event Intelligence Platform</p>
             </div>
           </div>

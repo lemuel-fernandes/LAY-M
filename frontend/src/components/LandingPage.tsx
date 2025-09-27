@@ -54,7 +54,7 @@ const LandingPage = () => {
       name: 'Sarah Chen',
       role: 'Event Director, TechCorp',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=60&h=60&fit=crop&crop=face',
-      text: 'LAY-M AI transformed how we manage events. The AI insights are incredible!',
+      text: 'SYNKRONIS transformed how we manage events. The AI insights are incredible!',
       rating: 5
     },
     {
@@ -191,7 +191,7 @@ const LandingPage = () => {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
-                  LAY-M AI
+                  SYNKRONIS
                 </h1>
               </div>
             </div>
@@ -776,7 +776,7 @@ const LandingPage = () => {
               Ready to Transform Your Events?
             </h2>
             <p style={{ fontSize: '20px', color: '#9ca3af', marginBottom: '40px' }}>
-              Join thousands of event professionals who trust LAY-M AI to deliver exceptional experiences
+              Join thousands of event professionals who trust SYNKRONIS to deliver exceptional experiences
             </p>
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button 
@@ -834,7 +834,7 @@ const LandingPage = () => {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
-                  LAY-M AI
+                  SYNKRONIS
                 </h3>
               </div>
             </div>
@@ -919,7 +919,7 @@ const LandingPage = () => {
               gap: '16px'
             }}>
               <p style={{ color: '#6b7280', fontSize: '14px', margin: 0 }}>
-                © 2024 LAY-M AI. All rights reserved. Powered by advanced artificial intelligence.
+                © 2024 SYNKRONIS. All rights reserved. Powered by advanced artificial intelligence.
               </p>
               <div style={{ display: 'flex', gap: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
