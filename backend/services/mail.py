@@ -1,9 +1,10 @@
 # services/mail.py
+import os
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 from sib_api_v3_sdk.configuration import Configuration
 from sib_api_v3_sdk.models.send_smtp_email import SendSmtpEmail
-import os
+import requests
 
 def send_contract_email(contract):
     """Send contract email to vendor using Brevo API"""
@@ -206,3 +207,121 @@ def send_contract_email_robust(contract):
     
     # Fallback to direct API call
     return send_contract_email_v2(contract)
+
+def send_certificate_email(certificate):
+    """Send certificate email to user using Brevo SDK"""
+    configuration = Configuration()
+    api_key = os.getenv('SAP')
+    if not api_key:
+        print("❌ BREVO_API_KEY environment variable not set")
+        return False
+    configuration.api_key['api-key'] = api_key
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+
+    try:
+        to_email = certificate.get("email") or certificate.get("user_email") or certificate.get("user").get("email")
+    except Exception:
+        to_email = None
+
+    if not to_email:
+        print("❌ Certificate recipient email not provided")
+        return False
+
+    title = certificate.get("title", "Certificate")
+    description = certificate.get("description", "")
+    issued = certificate.get("issued_date", "")
+    cert_id = str(certificate.get("id") or certificate.get("_id") or "")
+
+    html_content = f"""
+        <html><body>
+        <h2>You've received a certificate: {title}</h2>
+        <p>{description}</p>
+        <p>Issued: {issued}</p>
+        <p>Certificate ID: {cert_id}</p>
+        <p>Please download your certificate from the portal.</p>
+        </body></html>
+    """
+
+    send_email = SendSmtpEmail(
+        to=[{"email": to_email, "name": certificate.get("name", "") or ""}],
+        sender={
+            "email": os.getenv('SENDER_EMAIL', 'noreply@yourcompany.com'),
+            "name": os.getenv('COMPANY_NAME', 'Your Company')
+        },
+        subject=f"Your Certificate: {title}",
+        html_content=html_content,
+        text_content=f"You have been issued a certificate ({title}). Certificate ID: {cert_id}"
+    )
+
+    try:
+        response = api_instance.send_transac_email(send_email)
+        print(f" Certificate email sent. Message ID: {getattr(response, 'message_id', None)}")
+        return True
+    except ApiException as e:
+        print(f" Brevo API error (certificate): {e}")
+        return False
+    except Exception as e:
+        print(f" Unexpected error sending certificate email: {e}")
+        return False
+
+def send_certificate_email_v2(certificate):
+    """Fallback direct HTTP method for certificate emails"""
+    api_key = os.getenv('SAP')
+    if not api_key:
+        print("❌ BREVO_API_KEY environment variable not set")
+        return False
+
+    url = "https://api.brevo.com/v3/smtp/email"
+    try:
+        to_email = certificate.get("email") or certificate.get("user_email") or certificate.get("user").get("email")
+    except Exception:
+        to_email = None
+    if not to_email:
+        print("❌ Certificate recipient email not provided")
+        return False
+
+    title = certificate.get("title", "Certificate")
+    description = certificate.get("description", "")
+    issued = certificate.get("issued_date", "")
+    cert_id = str(certificate.get("id") or certificate.get("_id") or "")
+
+    payload = {
+        'to': [{'email': to_email, 'name': certificate.get("name", "")}],
+        'sender': {
+            'email': os.getenv('SENDER_EMAIL', 'noreply@yourcompany.com'),
+            'name': os.getenv('COMPANY_NAME', 'Your Company')
+        },
+        'subject': f'Your Certificate: {title}',
+        'htmlContent': f"""
+            <html><body>
+            <h2>You've received a certificate: {title}</h2>
+            <p>{description}</p>
+            <p>Issued: {issued}</p>
+            <p>Certificate ID: {cert_id}</p>
+            </body></html>
+        """,
+        'textContent': f"You have been issued a certificate ({title}). Certificate ID: {cert_id}"
+    }
+
+    headers = {
+        'api-key': api_key,
+        'Content-Type': 'application/json'
+    }
+
+    resp = requests.post(url, headers=headers, json=payload)
+    if resp.status_code in (200, 201):
+        print(" Certificate email sent via direct API")
+        return True
+    else:
+        print(f" Direct API error sending certificate email: {resp.status_code} {resp.text}")
+        return False
+
+def send_certificate_email_robust(certificate):
+    """Try SDK first, fallback to direct API"""
+    try:
+        if send_certificate_email(certificate):
+            return True
+    except Exception as e:
+        print(f"sdk send failed: {e}")
+    print("SDK method failed for certificate, trying direct API...")
+    return send_certificate_email_v2(certificate)
