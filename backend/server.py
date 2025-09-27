@@ -3,12 +3,13 @@ from typing import Union
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.v1.routes_auth import router as auth_router
+from api.v1.routes_task import router as task_router  # Add this import
+from api.v1.routes_events import router as events_router
+from api.v1.routes_feedback import router as feedback_router
 from db.db import client as mongo_client  
 from services.authMiddleware import AuthMiddleware
 from pymongo.errors import PyMongoError
-from services.roleMiddleware import RoleMiddleware
-from api.v1.routes_events import router as events_router
-from api.v1.routes_vendor import router as vendor_router
+
 app = FastAPI()
 app.add_middleware( 
     CORSMiddleware,
@@ -23,9 +24,11 @@ app.add_middleware(AuthMiddleware, protected_paths=protected_routes)
 protected_routes_roles = {}
 
 
+# Include all routers
 app.include_router(auth_router)
+app.include_router(task_router)  # Add this line
 app.include_router(events_router)
-app.include_router(vendor_router)
+app.include_router(feedback_router)
 
 @app.on_event("startup")
 async def startup_db():

@@ -1,37 +1,22 @@
-from pydantic import BaseModel, Field
-from typing import Optional
-from bson import ObjectId
 from datetime import datetime
-from db.db import tasks_collection
-
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
-
+from typing import Optional
+from pydantic import BaseModel, Field
+from bson import ObjectId
+from .Events import PyObjectId
 
 class TaskModel(BaseModel):
     id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
-    title: str
-    description: Optional[str] = None
-    completed: bool = False
-    owner_id: PyObjectId  
+    title: str = Field(..., description="Task title")
+    description: Optional[str] = Field(None, description="Task description")
+    event_id: Optional[PyObjectId] = Field(None, description="Associated event ID")
+    assignee_id: Optional[PyObjectId] = Field(None, description="Assigned user ID")
+    status: str = Field(default="pending", description="Task status")
+    priority: int = Field(default=1, ge=1, le=5, description="Task priority (1-5)")
+    due_date: Optional[datetime] = Field(None, description="Task due date")
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = None
-    due_date: Optional[datetime] = None
-    priority: Optional[int] = Field(default=1, ge=1, le=5) 
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     class Config:
-        allow_population_by_field_name = True
+        validate_by_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str, datetime: lambda dt: dt.isoformat()}
+        json_encoders = {ObjectId: str}
