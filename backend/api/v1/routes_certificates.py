@@ -1,12 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends, status, Request
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional, List
-from datetime import datetime
 from bson import ObjectId
+from models.Certificates import CertificateModel, PyObjectId
 from db.db import certificates_collection
-from services import mail
-from models.Certificates import PyObjectId, CertificateModel
-from services.authMiddleware import require_roles
+from fastapi import APIRouter, HTTPException, Depends, status, Request
+from datetime import datetime
+
 
 router = APIRouter(prefix="/api/v1/certificates", tags=["Certificates"])
 
@@ -74,10 +73,10 @@ class CertificateIssue(BaseModel):
     expiry_date: Optional[datetime] = None
 
 
-@router.post("/issue", dependencies=[Depends(require_roles("organizer", "admin"))], status_code=status.HTTP_201_CREATED)
+@router.post("/issue", status_code=status.HTTP_201_CREATED)
 async def issue_certificate(payload: CertificateIssue, request: Request):
     # create certificate record
-    try:
+    try:    
         uid = ObjectId(payload.user_id)
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid user_id")
