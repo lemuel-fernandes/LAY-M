@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from typing import List
 from bson import ObjectId
 
-from models import EventModel, PyObjectId
+from models.Events import EventModel, PyObjectId
 from db.db import events_collection  
 router = APIRouter(prefix="/api/v1/events", tags=["Events"])
 
