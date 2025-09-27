@@ -3,8 +3,8 @@ from typing import Union
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.v1.routes_auth import router as auth_router
-from db.db import client as mongo_client  # Import the shared client
-
+from db.db import client as mongo_client  
+from services.authMiddleware import AuthMiddleware
 from pymongo.errors import PyMongoError
 
 app = FastAPI()
@@ -15,6 +15,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+protected_routes = ["/api/v1/tasks", "/api/v1/users/me"]
+app.add_middleware(AuthMiddleware, protected_paths=protected_routes)
+
 app.include_router(auth_router)
 
 
