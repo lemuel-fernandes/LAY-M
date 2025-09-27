@@ -4,6 +4,25 @@ from datetime import datetime
 from bson import ObjectId
 from enum import Enum
 
+# This is the PyObjectId class you need to define:
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+    
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid ObjectId")
+        return ObjectId(v)
+    
+    @classmethod
+    def __get_pydantic_json_schema__(cls, core_schema, handler):
+        return {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{24}$",
+        }
+
 
 class EventStatusEnum(str, Enum):
     planned = "planned"
@@ -20,7 +39,7 @@ class EventModel(BaseModel):
     start_time: datetime
     end_time: datetime
     organizer_id: PyObjectId  
-    attendees: List[PyObjectId] = Field(default_factory=list)  #
+    attendees: List[PyObjectId] = Field(default_factory=list)
     status: EventStatusEnum = EventStatusEnum.planned
     max_attendees: Optional[int] = None
 
